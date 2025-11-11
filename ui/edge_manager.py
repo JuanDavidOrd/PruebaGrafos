@@ -1,4 +1,3 @@
-# ui/edge_manager.py
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
     QPushButton, QHBoxLayout, QAbstractItemView
@@ -7,7 +6,7 @@ from PySide6.QtCore import Qt
 
 class EdgeManager(QDialog):
     """
-    Dialogo para listar y (des)bloquear aristas del grafo.
+    Dialogo para listar y desbloquear aristas del grafo.
     """
     COLS = ["u", "v", "distancia (a-luz)", "bloqueada"]
 

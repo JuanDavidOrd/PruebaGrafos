@@ -1,4 +1,3 @@
-# sim/rules.py
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Tuple, Any
@@ -36,6 +35,11 @@ class RouteResult:
     remaining_life: float
     reason: str
     hay_left: float = 0.0
+    died: bool = False                          # Si el burro murió
+    initial_energy: float = 0.0                 # Energía inicial
+    initial_hay: float = 0.0                    # Pasto inicial
+    initial_life: float = 0.0                   # Vida inicial
+    visited_stars_info: List[Dict] = None       # Info detallada de estrellas visitadas
 
 def _norm_id(x: Any) -> str:
     return str(x)
@@ -43,7 +47,7 @@ def _norm_id(x: Any) -> str:
 def _parse_health(txt: str):
     return _UI2ENUM.get(txt, Health.EXCELLENT)
 
-# ----- Paso 2 (dejas tu implementación actual) -----
+# ----- Punto 2 -----
 def compute_route_step2(G, origin_id: str, health_txt: str,
                         energy_pct: float, hay_kg: float, life_ly: float) -> RouteResult:
     """
@@ -58,7 +62,7 @@ def compute_route_step2(G, origin_id: str, health_txt: str,
     # Si está muerto, devolver ruta trivial
     if health in ("muerto",):
         return RouteResult([origin], [], [origin], float(energy_pct), float(life_ly),
-                           "Burro muerto", hay_left=float(hay_kg))
+                        "Burro muerto", hay_left=float(hay_kg))
 
     # Selección del factor según salud
     factor = 2.0 if health == "moribundo" else _HEALTH_ENERGY_FACTOR.get(health, 1.3)
@@ -68,7 +72,8 @@ def compute_route_step2(G, origin_id: str, health_txt: str,
 
     if origin not in G.G.nodes:
         return RouteResult([], [], [], energy, life,
-                           "Origen inexistente en el grafo", hay_left=float(hay_kg))
+                        "Origen inexistente en el grafo", hay_left=float(hay_kg),
+                        initial_energy=energy, initial_hay=float(hay_kg), initial_life=life)
 
     visited = {origin}
     path = [origin]
@@ -120,7 +125,10 @@ def compute_route_step2(G, origin_id: str, health_txt: str,
         remaining_energy=max(0.0, min(100.0, energy)),
         remaining_life=max(0.0, life),
         reason=reason,
-        hay_left=float(hay_kg),
+       hay_left=float(hay_kg),
+       initial_energy=float(energy_pct),
+       initial_hay=float(hay_kg),
+       initial_life=float(life_ly),
     )
 
 # Helpers robustos para leer estrellas e investigación
@@ -160,18 +168,20 @@ def compute_route_step3(G, u, origin_id: str, health_txt: str,
                         energy_pct: float, hay_kg: float, life_ly: float) -> RouteResult:
     """
     Heurística voraz con estancia por estrella:
-      - 50% del tiempo: comer si energía < 50% (kg = min(hay, 0.5 / X))
-        * ganancia_energía = kg * gain_per_kg (cap a 100%)
-      - 50% restante: investigación (gasto) => energía -= (0.5 / X) * invest_energy_per_x
-      - efecto salud/vida de la estrella: vida += disease_life_delta (puede ser ±)
-      - movimiento: vecino no visitado más cercano que quepa en vida/energía
+    - 50% del tiempo: comer si energía < 50% (kg = min(hay, 0.5 / X))
+    * ganancia_energía = kg * gain_per_kg (cap a 100%)
+    - 50% restante: investigación (gasto) => energía -= (0.5 / X) * invest_energy_per_x
+    - efecto salud/vida de la estrella: vida += disease_life_delta (puede ser ±)
+    - movimiento: vecino no visitado más cercano que quepa en vida/energía
     """
     origin = _norm_id(origin_id)
     health = _parse_health(health_txt)
 
     if health in ("muerto",):
         return RouteResult([origin], [], [origin], float(energy_pct), float(life_ly),
-                           "Burro muerto", hay_left=float(hay_kg))
+                            "Burro muerto", hay_left=float(hay_kg), died=True,
+                            initial_energy=float(energy_pct), initial_hay=float(hay_kg), 
+                            initial_life=float(life_ly))
 
     factor = 2.0 if health == "moribundo" else _HEALTH_ENERGY_FACTOR.get(health, 1.3)
     gain_per_kg = _GAIN_PER_KG.get(health if isinstance(health, Health) else Health.BAD, 2.0)
@@ -179,14 +189,22 @@ def compute_route_step3(G, u, origin_id: str, health_txt: str,
     energy = float(energy_pct)
     life   = float(life_ly)
     hay    = float(hay_kg)
+    
+    # Guardar valores iniciales
+    initial_energy = energy
+    initial_hay = hay
+    initial_life = life
 
     if origin not in G.G.nodes:
-        return RouteResult([], [], [], energy, life, "Origen inexistente en el grafo", hay_left=hay)
+        return RouteResult([], [], [], energy, life, "Origen inexistente en el grafo", hay_left=hay,
+                          initial_energy=initial_energy, initial_hay=initial_hay, initial_life=initial_life)
 
     visited = {origin}
     path: List[str] = [origin]
     edges_path: List[Tuple[str, str]] = []
     current = origin
+    died = False
+    reason = "OK"
 
     while True:
         # ----- Estancia en estrella actual -----
@@ -213,7 +231,8 @@ def compute_route_step3(G, u, origin_id: str, health_txt: str,
 
         # corte si muere o queda sin energía tras la estancia
         if energy <= 0.0 or life <= 0.0:
-            reason = "Sin energía/vida tras estadía"
+            reason = "Burro murió durante la estancia"
+            died = True
             break
 
         # ----- Movimiento voraz -----
@@ -256,4 +275,8 @@ def compute_route_step3(G, u, origin_id: str, health_txt: str,
         remaining_life=max(0.0, life),
         reason=reason,
         hay_left=max(0.0, hay),
+        died=died,
+        initial_energy=initial_energy,
+        initial_hay=initial_hay,
+        initial_life=initial_life,
     )

@@ -1,10 +1,8 @@
-# core/sim/simulator.py
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Tuple
 
 from core.sim.rules import (
-    compute_route_step3,         # por si quieres usar el cálculo "completo" directo
     _get_star,
     _get_research,
     _UI2ENUM,
@@ -40,9 +38,15 @@ class RunLog:
     final_energy: float = 0.0
     final_grass: float = 0.0
     final_life: float = 0.0
+    initial_energy: float = 0.0                              # energía inicial
+    initial_grass: float = 0.0                               # pasto inicial
+    initial_life: float = 0.0                                # vida inicial
+    visited_stars: List[Dict] = field(default_factory=list)  # [{"star_id": str, "constellation_id": str, "grass_consumed": float, "time_invested": float}, ...]
+    total_time_invested: float = 0.0                         # tiempo total de investigación
+    died: bool = False                                        # si el burro murió
 
     def to_rows(self) -> List[Dict]:
-        """Convierte los pasos a filas (útil para CSV/tabla)."""
+        """Convierte los pasos a filas"""
         rows: List[Dict] = []
         for s in self.steps:
             rows.append({
@@ -59,7 +63,7 @@ class RunLog:
         return rows
 
     def edges(self) -> List[Tuple[str, str]]:
-        """Devuelve las aristas realmente recorridas, para pintar overlay."""
+        """Devuelve las aristas recorridas, para pintar overlay"""
         out: List[Tuple[str, str]] = []
         for s in self.steps:
             if s.to_star:
@@ -80,18 +84,18 @@ def simulate_step3(
     life_ly: float,
 ) -> Tuple[Optional[Step], Dict]:
     """
-    Ejecuta **UN** paso del Paso 3 (estancia + posible movimiento).
+    Ejecuta **UN** paso del punto 3 (estancia + posible movimiento).
     Devuelve:
-      - Step (o None si muere durante la estancia)
-      - nuevo estado: {"energy", "hay", "life", "next", "reason"}
+    - Step (o None si muere durante la estancia)
+    - nuevo estado: {"energy", "hay", "life", "next", "reason"}
 
     Lógica:
-      1) Estancia en estrella actual:
-         - Si energía < 50, come hasta 50% del tiempo (kg = 0.5 / x_time_per_kg)
-         - En el 50% restante: energía -= invest_energy_per_x * 0.5
-         - Vida += disease_life_delta
-      2) Si sigue vivo, escoge **vecino más cercano** cuyo coste quepa
-         en energía/vida y no esté bloqueado. Aplica movimiento.
+    1) Estancia en estrella actual:
+    - Si energía < 50, come hasta 50% del tiempo (kg = 0.5 / x_time_per_kg)
+    - En el 50% restante: energía -= invest_energy_per_x * 0.5
+    - Vida += disease_life_delta
+    2) Si sigue vivo, escoge **vecino más cercano** cuyo coste quepa
+    en energía/vida y no esté bloqueado. Aplica movimiento.
     """
     current = _norm_id(origin_id)
     health = _parse_health(health_txt)
@@ -199,7 +203,7 @@ def simulate_step3(
     }
 
 # ---------------------------------------------------------------------
-# EJECUTAR SIMULACIÓN COMPLETA (Paso 3)
+# EJECUTAR SIMULACIÓN COMPLETA (Punto 3)
 # ---------------------------------------------------------------------
 
 def run_full_step3(
@@ -213,12 +217,13 @@ def run_full_step3(
     max_steps: int = 1000,
 ) -> RunLog:
     """
-    Corre la simulación del **Paso 3** hasta detenerse (sin vecinos viables o muerte).
+    Corre la simulación del **punto 3** hasta detenerse (sin vecinos viables o muerte).
     Devuelve un RunLog con:
-      - steps (Step[])
-      - visited_order
-      - stop_reason
-      - final_energy / final_grass / final_life
+    - steps (Step[])
+    - visited_order
+    - stop_reason
+    - final_energy / final_grass / final_life
+    - initial_energy / initial_grass / initial_life (guardados al inicio)
     """
     current = _norm_id(origin_id)
     energy = float(energy_pct)
@@ -226,6 +231,9 @@ def run_full_step3(
     life = float(life_ly)
 
     log = RunLog()
+    log.initial_energy = energy    # Guardar valores iniciales
+    log.initial_grass = hay
+    log.initial_life = life
     log.visited_order.append(current)
 
     for _ in range(max_steps):
@@ -237,6 +245,7 @@ def run_full_step3(
             log.final_energy = state["energy"]
             log.final_grass = state["hay"]
             log.final_life = state["life"]
+            log.died = True  # Marcar que murió
             break
 
         # registrar el paso

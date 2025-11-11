@@ -1,4 +1,3 @@
-# ui/params_panel.py
 from PySide6.QtWidgets import (
     QWidget, QGroupBox, QLabel, QComboBox, QSpinBox, QDoubleSpinBox,
     QVBoxLayout, QFormLayout, QPushButton, QHBoxLayout
@@ -55,7 +54,7 @@ class ParamsPanel(QWidget):
         root.addWidget(box)
         root.addWidget(self.btn_edit_stars, alignment=Qt.AlignTop)
 
-        self.setDisabled(True)  # se habilita cuando hay universo cargado
+        self.setDisabled(True)  # solo se habilita cuando hay universo cargado
 
     # --- API pública ---
 
@@ -82,7 +81,7 @@ class ParamsPanel(QWidget):
             if sid in ids_xy:
                 self.cb_origin.addItem(f"{sid} – {name}", sid)
 
-        # valores globales (si existen en el JSON cargado)
+        # valores globales (por si existen en el JSON cargado)
         energy0 = getattr(u, "burroenergiaInicial", None) or getattr(u, "burroEnergy", None)
         if energy0 is None:
             energy0 = 100

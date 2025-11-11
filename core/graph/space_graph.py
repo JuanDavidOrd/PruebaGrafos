@@ -1,7 +1,5 @@
-# core/graph/space_graph.py
 import math
 import networkx as nx
-# from core.io.schema import UniverseIn  # <- no es necesario importarlo aquí
 
 RED_MULTI = "#d62728"
 
@@ -10,8 +8,8 @@ class SpaceGraph:
     def __init__(self, universe):
         """
         Construye un grafo no dirigido con:
-          - nodos: id, x, y, type, galaxyId
-          - aristas: distance, blocked
+        - nodos: id, x, y, type, galaxyId
+        - aristas: distance, blocked
         'universe.stars' y 'universe.edges' deben existir.
         """
         self.G = nx.Graph()

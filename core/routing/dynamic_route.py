@@ -23,7 +23,7 @@ ALPHA, BETA, GAMMA = 0.1, 0.01, 0.01
 
 
 def simulate_visit(G: SpaceGraph, node: str, energy: float, grass: float, life: float, health) -> tuple[float, float, float]:
-    """Aplica reglas de comer/investigar y retorna (energy, grass, life) actualizados."""
+    """Aplica reglas de comer/investigar y retorna (energy, grass, life)"""
     n = G.G.nodes[node]
     r = n["research"]
     # comer si <50%
@@ -31,8 +31,8 @@ def simulate_visit(G: SpaceGraph, node: str, energy: float, grass: float, life: 
     if energy < 50.0:
         eat_time_budget = 0.5 # 50% del tiempo de estadía relativo (escala abstracta)
         # kg posibles por tiempo disponible
-        # usamos x_time_per_kg como costo temporal absoluto y su presupuesto relativo 0.5
-        # aquí, por simplicidad, 1 unidad total de estadía => kg_max = 0.5 / x_time_per_kg
+        # sse usa x_time_per_kg como costo temporal absoluto y su presupuesto relativo 0.5
+        # por simplicidad, 1 unidad total de estadía => kg_max = 0.5 / x_time_per_kg
         kg_max = max(0.0, 0.5 / max(r.x_time_per_kg, 1e-9))
         kg = min(kg_max, grass)
         energy += eat_energy_gain(health, kg)

@@ -1,4 +1,3 @@
-# ui/star_editor.py
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
     QPushButton, QHBoxLayout, QMessageBox, QAbstractItemView
@@ -13,8 +12,8 @@ def _get(obj, name, default=None):
 
 def _ensure_research(obj):
     """
-    Devuelve (research_obj, r_get, r_set)
-    research_obj puede ser dict o SimpleNamespace (modelo liviano).
+    Devuelve (research_obj, r_get, r_set) donde:
+    - research_obj: el dict o modelo research asociado a obj (creado si no existía)
     """
     if isinstance(obj, dict):
         r = obj.setdefault("research", {}) or {}
