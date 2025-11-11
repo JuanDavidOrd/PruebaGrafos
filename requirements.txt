@@ -1,0 +1,9 @@
+PySide6==6.7.3
+numpy==1.26.4
+matplotlib==3.8.2
+kiwisolver==1.4.5
+pillow==10.3.0
+networkx==3.1
+pydantic==2.7.4
+pydantic-core==2.18.4
+pandas==2.1.4
