@@ -1,164 +1,244 @@
 {
   "constellations": [
     {
-      "name": "Constelación del Burro",
+      "name": "Test Intercalado A",
       "starts": [
         {
           "id": 1,
-          "label": "Alpha1",
+          "label": "Star1",
+          "coordenates": { "x": 15, "y": 20 },
           "linkedTo": [
-            {
-              "starId": 2,
-              "distance": 120
-            },
-            {
-              "starId": 4,
-              "distance": 87
-            },
-            {
-              "starId": 5,
-              "distance": 101
-            }
+            { "starId": 2, "distance": 22 },
+            { "starId": 6, "distance": 28 }
           ],
-          "radius": 0.4,
-          "timeToEat": 3,
-          "amountOfEnergy": 1,
-          "coordenates": {
-            "x": 25,
-            "y": 34
-          },
-          "hypergiant": false
+          "radius": 0.5,
+          "timeToEat": 2,
+          "amountOfEnergy": 0,
+          "hypergiant": false,
+          "research": {
+            "x_time_per_kg": 1.2,
+            "invest_energy_per_x": 1.0,
+            "disease_life_delta": 0.0
+          }
         },
         {
           "id": 2,
-          "label": "Beta23",
+          "label": "Star2",
+          "coordenates": { "x": 35, "y": 26 },
           "linkedTo": [
-            {
-              "starId": 1,
-              "distance": 120
-            },
-            {
-              "starId": 7,
-              "distance": 45
-            },
-            {
-              "starId": 3,
-              "distance": 17
-            }
+            { "starId": 1, "distance": 22 },
+            { "starId": 3, "distance": 18 },
+            { "starId": 6, "distance": 25 },
+            { "starId": 4, "distance": 39 }
           ],
-          "radius": 0.2,
+          "radius": 0.5,
           "timeToEat": 2,
-          "amountOfEnergy": 2,
-          "coordenates": {
-            "x": 37,
-            "y": 15
-          },
-          "hypergiant": false
+          "amountOfEnergy": 0,
+          "hypergiant": false,
+          "research": {
+            "x_time_per_kg": 1.5,
+            "invest_energy_per_x": 2.5,
+            "disease_life_delta": -1.0
+          }
         },
         {
           "id": 3,
-          "label": "Alpha53",
+          "label": "Star3",
+          "coordenates": { "x": 58, "y": 40 },
           "linkedTo": [
-            {
-              "starId": 5,
-              "distance": 86
-            },
-            {
-              "starId": 2,
-              "distance": 17
-            },
-            {
-              "starId": 9,
-              "distance": 15
-            }
+            { "starId": 2, "distance": 18 },
+            { "starId": 4, "distance": 16 },
+            { "starId": 6, "distance": 36 },
+            { "starId": 8, "distance": 41 }
           ],
-          "radius": 1,
-          "timeToEat": 1,
-          "amountOfEnergy": 3,
-          "coordenates": {
-            "x": 75,
-            "y": 43
-          },
-          "hypergiant": true
+          "radius": 0.5,
+          "timeToEat": 2,
+          "amountOfEnergy": 0,
+          "hypergiant": false,
+          "research": {
+            "x_time_per_kg": 0.8,
+            "invest_energy_per_x": 2.0,
+            "disease_life_delta": 5.0
+          }
+        },
+        {
+          "id": 4,
+          "label": "Star4",
+          "coordenates": { "x": 80, "y": 50 },
+          "linkedTo": [
+            { "starId": 3, "distance": 16 },
+            { "starId": 5, "distance": 26 },
+            { "starId": 2, "distance": 39 },
+            { "starId": 7, "distance": 34 }
+          ],
+          "radius": 0.5,
+          "timeToEat": 2,
+          "amountOfEnergy": 0,
+          "hypergiant": false,
+          "research": {
+            "x_time_per_kg": 1.2,
+            "invest_energy_per_x": 0.8,
+            "disease_life_delta": 5.0
+          }
+        },
+        {
+          "id": 5,
+          "label": "Star5",
+          "coordenates": { "x": 110, "y": 65 },
+          "linkedTo": [
+            { "starId": 4, "distance": 26 },
+            { "starId": 7, "distance": 33 }
+          ],
+          "radius": 0.5,
+          "timeToEat": 2,
+          "amountOfEnergy": 0,
+          "hypergiant": true,
+          "research": {
+            "x_time_per_kg": 3.0,
+            "invest_energy_per_x": 3.0,
+            "disease_life_delta": -8.0
+          }
+        },
+        {
+          "id": 6,
+          "label": "Star6",
+          "coordenates": { "x": 50, "y": 18 },
+          "linkedTo": [
+            { "starId": 1, "distance": 28 },
+            { "starId": 2, "distance": 25 },
+            { "starId": 3, "distance": 36 },
+            { "starId": 7, "distance": 33 }
+          ],
+          "radius": 0.5,
+          "timeToEat": 2,
+          "amountOfEnergy": 0,
+          "hypergiant": false,
+          "research": {
+            "x_time_per_kg": 1.0,
+            "invest_energy_per_x": 0.0,
+            "disease_life_delta": 0.0
+          }
+        },
+        {
+          "id": 7,
+          "label": "Star7",
+          "coordenates": { "x": 85, "y": 24 },
+          "linkedTo": [
+            { "starId": 6, "distance": 33 },
+            { "starId": 4, "distance": 34 },
+            { "starId": 5, "distance": 33 },
+            { "starId": 8, "distance": 45 }
+          ],
+          "radius": 0.5,
+          "timeToEat": 2,
+          "amountOfEnergy": 0,
+          "hypergiant": false,
+          "research": {
+            "x_time_per_kg": 0.5,
+            "invest_energy_per_x": 4.0,
+            "disease_life_delta": 0.0
+          }
+        },
+        {
+          "id": 8,
+          "label": "Star8",
+          "coordenates": { "x": 28, "y": 70 },
+          "linkedTo": [
+            { "starId": 3, "distance": 41 },
+            { "starId": 1, "distance": 52 }
+          ],
+          "radius": 0.5,
+          "timeToEat": 2,
+          "amountOfEnergy": 0,
+          "hypergiant": false,
+          "research": {
+            "x_time_per_kg": 2.5,
+            "invest_energy_per_x": 1.0,
+            "disease_life_delta": 3.0
+          }
         }
       ]
     },
     {
-      "name": "Constelación de la Araña",
+      "name": "Test Intercalado B",
       "starts": [
         {
-          "id": 12,
-          "label": "Beta178",
-          "linkedTo": [
-            {
-              "starId": 14,
-              "distance": 120
-            },
-            {
-              "starId": 17,
-              "distance": 87
-            },
-            {
-              "starId": 11,
-              "distance": 101
-            }
-          ],
-          "radius": 0.6,
-          "timeToEat": 3,
-          "amountOfEnergy": 1,
-          "coordenates": {
-            "x": 123,
-            "y": 167
-          },
-          "hypergiant": false
-        },
-        {
-          "id": 13,
-          "label": "Gama23",
-          "linkedTo": [
-            {
-              "starId": 15,
-              "distance": 120
-            },
-            {
-              "starId": 17,
-              "distance": 45
-            }
-          ],
-          "radius": 0.8,
-          "timeToEat": 3,
-          "amountOfEnergy": 5,
-          "coordenates": {
-            "x": 189,
-            "y": 146
-          },
-          "hypergiant": true
-        },
-        {
           "id": 3,
-          "label": "Alpha53",
+          "label": "Star3",
+          "coordenates": { "x": 58, "y": 40 },
           "linkedTo": [
-            {
-              "starId": 12,
-              "distance": 15
-            }
+            { "starId": 9, "distance": 50 }
           ],
-          "radius": 1,
-          "timeToEat": 1,
-          "amountOfEnergy": 3,
-          "coordenates": {
-            "x": 75,
-            "y": 43
-          },
-          "hypergiant": true
+          "radius": 0.5,
+          "timeToEat": 2,
+          "amountOfEnergy": 0,
+          "hypergiant": false,
+          "research": {
+            "x_time_per_kg": 0.8,
+            "invest_energy_per_x": 2.0,
+            "disease_life_delta": 5.0
+          }
+        },
+        {
+          "id": 4,
+          "label": "Star4",
+          "coordenates": { "x": 80, "y": 50 },
+          "linkedTo": [
+            { "starId": 9, "distance": 42 }
+          ],
+          "radius": 0.5,
+          "timeToEat": 2,
+          "amountOfEnergy": 0,
+          "hypergiant": false,
+          "research": {
+            "x_time_per_kg": 1.2,
+            "invest_energy_per_x": 0.8,
+            "disease_life_delta": 5.0
+          }
+        },
+        {
+          "id": 9,
+          "label": "Star9",
+          "coordenates": { "x": 120, "y": 90 },
+          "linkedTo": [
+            { "starId": 3, "distance": 50 },
+            { "starId": 4, "distance": 42 },
+            { "starId": 10, "distance": 20 }
+          ],
+          "radius": 0.5,
+          "timeToEat": 2,
+          "amountOfEnergy": 0,
+          "hypergiant": false,
+          "research": {
+            "x_time_per_kg": 1.8,
+            "invest_energy_per_x": 1.5,
+            "disease_life_delta": -2.0
+          }
+        },
+        {
+          "id": 10,
+          "label": "Star10",
+          "coordenates": { "x": 145, "y": 95 },
+          "linkedTo": [
+            { "starId": 9, "distance": 20 },
+            { "starId": 7, "distance": 45 }
+          ],
+          "radius": 0.5,
+          "timeToEat": 2,
+          "amountOfEnergy": 0,
+          "hypergiant": true,
+          "research": {
+            "x_time_per_kg": 3.2,
+            "invest_energy_per_x": 2.2,
+            "disease_life_delta": -6.0
+          }
         }
       ]
     }
   ],
-  "burroenergiaInicial": 100,
+  "burroenergiaInicial": 60,
   "estadoSalud": "Excelente",
-  "pasto": 300,
-  "number": 123,
-  "startAge": 12,
-  "deathAge": 3567
+  "pasto": 8,
+  "startAge": 5,
+  "deathAge": 500
 }

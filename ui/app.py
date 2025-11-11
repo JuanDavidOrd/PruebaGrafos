@@ -9,8 +9,9 @@ from core.graph.space_graph import SpaceGraph
 from ui.map_view import MapView
 from ui.params_panel import ParamsPanel
 from ui.star_editor import StarEditor
+from ui.edge_manager import EdgeManager  # 👈 NUEVO
 
-# 👇 Importa directamente desde sim.rules
+# Reglas de simulación
 from core.sim.rules import compute_route_step2, compute_route_step3
 
 
@@ -31,18 +32,20 @@ class MainWindow(QMainWindow):
         self.params = ParamsPanel(self)
 
         # --- Botones ---
-        self.btn_load = QPushButton("Cargar JSON")
-        self.btn_edit = QPushButton("Editar estrellas…")
+        self.btn_load   = QPushButton("Cargar JSON")
+        self.btn_edit   = QPushButton("Editar estrellas…")
+        self.btn_edges  = QPushButton("Bloquear/habilitar vías…")  # 👈 NUEVO
         self.btn_route2 = QPushButton("Calcular ruta (Paso 2)")
         self.btn_route3 = QPushButton("Calcular ruta (Paso 3)")
 
         # Estado inicial de botones
-        for b in (self.btn_edit, self.btn_route2, self.btn_route3, self.params.btn_edit_stars):
+        for b in (self.btn_edit, self.btn_edges, self.btn_route2, self.btn_route3, self.params.btn_edit_stars):
             b.setEnabled(False)
 
         # Conexiones (una sola vez)
         self.btn_load.clicked.connect(self.on_load)
         self.btn_edit.clicked.connect(self.on_edit_stars)
+        self.btn_edges.clicked.connect(self.on_manage_edges)          # 👈 NUEVO
         self.params.btn_edit_stars.clicked.connect(self.on_edit_stars)
         self.btn_route2.clicked.connect(self.on_route2)
         self.btn_route3.clicked.connect(self.on_route3)
@@ -51,6 +54,7 @@ class MainWindow(QMainWindow):
         side = QVBoxLayout()
         side.addWidget(self.btn_load)
         side.addWidget(self.btn_edit)
+        side.addWidget(self.btn_edges)     # 👈 NUEVO en el layout
         side.addWidget(self.btn_route2)
         side.addWidget(self.btn_route3)
         side.addWidget(self.params)
@@ -86,6 +90,7 @@ class MainWindow(QMainWindow):
             # Habilita panel y botones
             self.params.set_from_universe(self.u)
             self.btn_edit.setEnabled(True)
+            self.btn_edges.setEnabled(True)               # 👈 habilita gestor de vías
             self.btn_route2.setEnabled(True)
             self.btn_route3.setEnabled(True)
             self.params.btn_edit_stars.setEnabled(True)
@@ -104,6 +109,15 @@ class MainWindow(QMainWindow):
             const_colors = {c.id: c.color for c in self.u.constellations}
             self.view.draw(self.G, self.u.memberships, const_colors)
 
+    def on_manage_edges(self):  # 👈 NUEVO
+        if not (self.u and self.G):
+            return
+        dlg = EdgeManager(self.G.G, self)  # pasa el networkx.Graph interno
+        if dlg.exec():
+            # Redibuja para ver cambios (las vías bloqueadas salen grises punteadas)
+            const_colors = {c.id: c.color for c in self.u.constellations}
+            self.view.draw(self.G, self.u.memberships, const_colors)
+
     def on_route2(self):
         if not (self.u and self.G):
             return
@@ -116,9 +130,13 @@ class MainWindow(QMainWindow):
             hay_kg=float(p["hay_kg"]),
             life_ly=float(p["life_ly"]),
         )
+        if res is None:
+            QMessageBox.warning(self, "Ruta – Paso 2", "No se pudo calcular la ruta (resultado vacío).")
+            return
 
         const_colors = {c.id: c.color for c in self.u.constellations}
-        self.view.draw(self.G, self.u.memberships, const_colors, overlay_edges=res.edges)
+        overlay = getattr(res, "edges", None) or []
+        self.view.draw(self.G, self.u.memberships, const_colors, overlay_edges=overlay)
 
         msg = (
             f"Visitas: {len(res.path)}\n"
@@ -128,6 +146,7 @@ class MainWindow(QMainWindow):
             f"Motivo de parada: {res.reason}"
         )
         QMessageBox.information(self, "Ruta – Paso 2", msg)
+        
 
     def on_route3(self):
         if not (self.u and self.G):

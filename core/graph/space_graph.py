@@ -1,54 +1,71 @@
+# core/graph/space_graph.py
 import math
 import networkx as nx
-from core.io.schema import UniverseIn
-
+# from core.io.schema import UniverseIn  # <- no es necesario importarlo aquí
 
 RED_MULTI = "#d62728"
 
 
 class SpaceGraph:
     def __init__(self, universe):
-        import networkx as nx
+        """
+        Construye un grafo no dirigido con:
+          - nodos: id, x, y, type, galaxyId
+          - aristas: distance, blocked
+        'universe.stars' y 'universe.edges' deben existir.
+        """
         self.G = nx.Graph()
 
-        # 1) Nodos (todos con coords)
+        # --- Nodos ---
         for s in universe.stars:
-            self.G.add_node(s.id, x=s.x, y=s.y, type=s.type, galaxyId=s.galaxyId)
+            self.G.add_node(
+                str(s.id),
+                x=float(s.x) if s.x is not None else None,
+                y=float(s.y) if s.y is not None else None,
+                type=getattr(s, "type", None),
+                galaxyId=getattr(s, "galaxyId", None),
+            )
 
-        # 2) Aristas (solo si ambos nodos existen)
+        # --- Aristas ---
         for e in universe.edges:
-            if self.G.has_node(e.u) and self.G.has_node(e.v):
-                self.G.add_edge(e.u, e.v, distance=e.distance, blocked=bool(getattr(e, "blocked", False)))
-            # else: podrías loguear/avisar
+            u = str(e.u)
+            v = str(e.v)
+            if not (self.G.has_node(u) and self.G.has_node(v)):
+                continue
 
-
-
-    def _build(self):
-        stars = {s.id: s for s in self.u.stars}
-        # nodos
-        for s in self.u.stars:
-            self.G.add_node(s.id, x=s.x, y=s.y, galaxy=s.galaxyId, type=s.type, research=s.research)
-        # aristas
-        for e in self.u.edges:
-            d = e.distance
+            # distancia: usa la del JSON o calcula por coordenadas
+            d = getattr(e, "distance", None)
             if d is None:
-                a, b = stars[e.u], stars[e.v]
-                d = math.hypot(a.x - b.x, a.y - b.y)
-            self.G.add_edge(e.u, e.v, distance=d, blocked=e.blocked)
+                nx_u = self.G.nodes[u]
+                nx_v = self.G.nodes[v]
+                if nx_u.get("x") is not None and nx_v.get("x") is not None:
+                    d = math.hypot(nx_u["x"] - nx_v["x"], nx_u["y"] - nx_v["y"])
+                else:
+                    d = 0.0
 
+            blocked = bool(getattr(e, "blocked", False))
+            self.G.add_edge(u, v, distance=float(d), blocked=blocked)
 
-def neighbors(self, star_id: str):
-    for v in self.G.neighbors(star_id):
-        data = self.G[star_id][v]
-        if not data.get("blocked", False):
-            yield v, data["distance"]
+    # ---------- API de ayuda ----------
 
+    def neighbors(self, star_id: str):
+        """Vecinos no bloqueados de 'star_id' con su distancia."""
+        sid = str(star_id)
+        if not self.G.has_node(sid):
+            return
+        for v in self.G.neighbors(sid):
+            data = self.G[sid][v]
+            if not data.get("blocked", False):
+                yield str(v), float(data.get("distance", 0.0))
 
-def set_blocked(self, u: str, v: str, value: bool):
-    if self.G.has_edge(u, v):
-        self.G[u][v]["blocked"] = value
+    def set_blocked(self, u: str, v: str, value: bool):
+        """Marca/desmarca una arista como bloqueada."""
+        uu, vv = str(u), str(v)
+        if self.G.has_edge(uu, vv):
+            self.G[uu][vv]["blocked"] = bool(value)
 
-
-def coords(self, s: str):
-    n = self.G.nodes[s]
-    return n["x"], n["y"]
+    def coords(self, s: str):
+        """Devuelve (x, y) del nodo 's'."""
+        sid = str(s)
+        n = self.G.nodes[sid]
+        return n.get("x"), n.get("y")
